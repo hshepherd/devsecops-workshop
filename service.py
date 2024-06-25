@@ -7,6 +7,18 @@ app = Flask(__name__)
 
 db_connection = db.connect_database()
 
+@app.route("/api/product/hash", methods=["GET"])
+def get_product_hash():
+    import hashlib
+    products = db.get_products(db_connection, 100, 0)
+    product_id = int(request.args.get('pid', 0))
+    if product_id == 0:
+        return "error, specify a product id", 500
+    if product_id > len(products):
+        return "invalid product id", 500
+    hash = hashlib.sha256(products[product_id].name.encode('utf-8')).hexdigest()
+    return hash
+
 # API to get the list of products
 @app.route("/api/product/list", methods=["GET"])
 def api_product_list():
